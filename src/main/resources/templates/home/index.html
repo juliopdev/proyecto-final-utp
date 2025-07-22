@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+      layout:decorate="~{layout}">
+
+<head>
+    <title th:text="${pageTitle}">Inicio - Proyecto Final UTP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <main layout:fragment="content">
+        <!-- Carrusel de imágenes promocionales -->
+        <div class="inicio" id="inicio">
+            <div class="imagenes-promocional">
+                <div id="miCarrusel" class="carousel slide" data-bs-ride="carousel">
+                    <!-- Indicadores -->
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#miCarrusel" data-bs-slide-to="0" class="active"></button>
+                        <button type="button" data-bs-target="#miCarrusel" data-bs-slide-to="1"></button>
+                        <button type="button" data-bs-target="#miCarrusel" data-bs-slide-to="2"></button>
+                    </div>
+                    
+                    <!-- Imágenes del carrusel -->
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img th:src="@{/img/banner1.jpg}" class="d-block w-100" alt="Banner 1">
+                        </div>
+                        <div class="carousel-item">
+                            <img th:src="@{/img/banner2.jpg}" class="d-block w-100" alt="Banner 2">
+                        </div>
+                        <div class="carousel-item">
+                            <img th:src="@{/img/banner3.jpg}" class="d-block w-100" alt="Banner 3">
+                        </div>
+                    </div>
+                    
+                    <!-- Controles del carrusel -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#miCarrusel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#miCarrusel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor del Menú -->
+        <br>
+        <div class="container">
+            <h1 th:text="${welcomeMessage ?: '¡Elige lo que más te guste!'}">¡Elige lo que más te guste!</h1>
+            
+            <section class="card-custom"></section>
+            
+            <!-- Productos destacados -->
+            <div class="menu-preview" th:if="${featuredProducts != null and !featuredProducts.empty}">
+                <div th:each="product : ${featuredProducts}" class="menu-item">
+                    <div class="image-container">
+                        <img th:src="${product.imageUrl} ?: '@{/img/producto-default.png}'" 
+                             th:alt="${product.name}">
+                    </div>
+                    <div class="info">
+                        <h5 th:text="${product.name}">PRODUCTO</h5>
+                        <p th:text="${product.getFormattedPrice()}">S/ 0.00</p>
+                        <a th:href="@{/products/{slug}(slug=${product.slug})}" class="btn_2">Ver más</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón Ver productos completo -->
+            <div class="video-btn-container">
+                <video class="video-fondo" muted loop playsinline>
+                    <source th:src="@{/video/comercial.mp4}" type="video/mp4">
+                </video>
+                <button class="ver-mas-btn" onclick="window.location.href='[[${@mvcUriComponentsBuilder.fromMappingName(\'PC#listProducts\').build()}]]'">
+                    Ver productos completos
+                </button>
+            </div>
+        </div>
+
+        <br>
+        
+        <!-- Sección de productos recientes -->
+        <div th:if="${recentProducts != null and !recentProducts.empty}" class="container">
+            <h2>Productos Recientes</h2>
+            <div class="row">
+                <div th:each="product : ${recentProducts}" class="col-md-4 col-lg-3 mb-4">
+                    <div class="card h-100">
+                        <img th:src="${product.imageUrl} ?: '@{/img/producto-default.png}'" 
+                             class="card-img-top" th:alt="${product.name}" style="height: 200px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title" th:text="${product.name}">Producto</h5>
+                            <p class="card-text flex-grow-1" th:text="${product.description}">Descripción</p>
+                            <div class="mt-auto">
+                                <p class="card-text">
+                                    <strong th:text="${product.getFormattedPrice()}">S/ 0.00</strong>
+                                </p>
+                                <div class="d-flex gap-2">
+                                    <a th:href="@{/products/{slug}(slug=${product.slug})}" 
+                                       class="btn btn-primary flex-grow-1">Ver</a>
+                                    <button class="btn btn-success" 
+                                            th:data-product-id="${product.id}"
+                                            onclick="addToCart(this)">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de reseñas -->
+        <div id="contenedorResenas" class="bg-gray-100 py-10 px-4">
+            <div class="max-w-7xl mx-auto relative">
+                <h2 class="text-2xl font-bold text-center mb-6">Testimonios de nuestros usuarios</h2>
+
+                <!-- Carrusel de reseñas -->
+                <div id="carruselResenas" class="carrusel flex gap-4 no-scrollbar px-10">
+                    <!-- Ejemplo de reseña estática -->
+                    <div class="carta-reseña bg-white rounded-lg shadow-md p-4 border border-gray-200 text-black">
+                        <div class="flex justify-between items-center mb-2">
+                            <div>
+                                <p class="font-semibold text-sm">Usuario Demo</p>
+                                <p class="text-xs text-gray-500">Cliente Satisfecho</p>
+                            </div>
+                            <span class="text-red-600 text-xs font-bold flex items-center gap-1">⭐ 5/5</span>
+                        </div>
+                        <p class="text-sm text-gray-700 mb-4">
+                            Excelente servicio y productos de calidad. Muy recomendado para estudiantes.
+                        </p>
+                        <div class="flex items-center justify-between text-xs text-gray-500 border-t pt-2">
+                            <div class="flex items-center gap-1">
+                                <span>Verified • Enero 2025</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-8">
+                    <button onclick="abrirFormularioComentario()" 
+                            class="bg-red-600 text-white px-6 py-2 rounded-full shadow hover:bg-gray-700">
+                        Agregar Comentario
+                    </button>
+                    
+                    <!-- Modal de comentario -->
+                    <div id="modalComentario" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50">
+                        <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-black">
+                            <h3 class="text-lg font-bold mb-4">Agregar nuevo comentario</h3>
+                            
+                            <form id="comentarioForm" th:action="@{/api/reviews}" method="post">
+                                <input id="nombreCritico" name="nombre" type="text" placeholder="Tu nombre" 
+                                       class="w-full mb-2 p-2 border rounded bg-white text-black" required>
+                                
+                                <select id="categoriaCritico" name="categoria" 
+                                        class="w-full mb-2 p-2 border rounded bg-white text-black" required>
+                                    <option value="">Selecciona una categoría</option>
+                                    <option value="producto">Producto</option>
+                                    <option value="servicio">Servicio</option>
+                                    <option value="entrega">Entrega</option>
+                                    <option value="general">General</option>
+                                </select>
+                                
+                                <textarea id="textoComentario" name="comentario" placeholder="Tu comentario" 
+                                          class="w-full mb-2 p-2 border rounded bg-white text-black" required></textarea>
+                                
+                                <select id="puntuacion" name="puntuacion" 
+                                        class="w-full mb-4 p-2 border rounded bg-white text-black" required>
+                                    <option value="">Selecciona puntuación</option>
+                                    <option value="1">1 estrella</option>
+                                    <option value="2">2 estrellas</option>
+                                    <option value="3">3 estrellas</option>
+                                    <option value="4">4 estrellas</option>
+                                    <option value="5">5 estrellas</option>
+                                </select>
+
+                                <div class="flex justify-end gap-2">
+                                    <button type="button" onclick="cerrarFormularioComentario()" 
+                                            class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" 
+                                            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                                        Agregar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de navegación del carrusel -->
+                <button onclick="anterior()" 
+                        class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white text-gray-800 border border-gray-300 p-3 rounded-full text-2xl shadow hover:bg-gray-200 z-10">
+                    &lt;
+                </button>
+                <button onclick="siguiente()" 
+                        class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white text-gray-800 border border-gray-300 p-3 rounded-full text-2xl shadow hover:bg-gray-200 z-10">
+                    &gt;
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts específicos -->
+    <th:block layout:fragment="scripts">
+        <script>
+            // Funciones para el carrusel de reseñas
+            const carrusel = document.getElementById('carruselResenas');
+            let tarjetas = document.querySelectorAll('.carta-reseña');
+            let posicion = 0;
+
+            function mostrar(pos) {
+                if (tarjetas.length === 0) return;
+                const desplazamiento = tarjetas[pos].offsetLeft || 0;
+                carrusel.scrollTo({ left: desplazamiento, behavior: 'smooth' });
+            }
+
+            function siguiente() {
+                if (tarjetas.length === 0) return;
+                posicion = (posicion + 1) % tarjetas.length;
+                mostrar(posicion);
+                reiniciar();
+            }
+
+            function anterior() {
+                if (tarjetas.length === 0) return;
+                posicion = (posicion - 1 + tarjetas.length) % tarjetas.length;
+                mostrar(posicion);
+                reiniciar();
+            }
+
+            let autoSlide = setInterval(siguiente, 5000);
+
+            function reiniciar() {
+                clearInterval(autoSlide);
+                autoSlide = setInterval(siguiente, 5000);
+            }
+
+            function abrirFormularioComentario() {
+                document.getElementById('modalComentario').classList.remove('hidden');
+            }
+
+            function cerrarFormularioComentario() {
+                document.getElementById('modalComentario').classList.add('hidden');
+                document.getElementById('comentarioForm').reset();
+            }
+
+            // Función para agregar al carrito
+            function addToCart(button) {
+                const productId = button.getAttribute('data-product-id');
+                
+                fetch(`/api/cart/add/${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ quantity: 1 })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Mostrar mensaje de éxito
+                        const toast = document.createElement('div');
+                        toast.className = 'alert alert-success position-fixed top-0 end-0 m-3';
+                        toast.style.zIndex = '9999';
+                        toast.innerHTML = `
+                            <strong>¡Agregado!</strong> Producto añadido al carrito.
+                            <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+                        `;
+                        document.body.appendChild(toast);
+                        
+                        // Remover el toast después de 3 segundos
+                        setTimeout(() => {
+                            if (toast.parentElement) {
+                                toast.remove();
+                            }
+                        }, 3000);
+                    } else {
+                        alert('Error al agregar el producto al carrito');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al agregar el producto al carrito');
+                });
+            }
+
+            // Auto-scroll del video
+            const container = document.querySelector('.video-btn-container');
+            const video = container?.querySelector('video');
+            
+            if (container && video) {
+                container.addEventListener('mouseenter', () => {
+                    video.play();
+                });
+                container.addEventListener('mouseleave', () => {
+                    video.pause();
+                    video.currentTime = 0;
+                });
+            }
+
+            // Manejo del formulario de comentarios
+            document.getElementById('comentarioForm')?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData.entries());
+                
+                fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        cerrarFormularioComentario();
+                        // Recargar la página para mostrar el nuevo comentario
+                        window.location.reload();
+                    } else {
+                        alert('Error al enviar el comentario');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al enviar el comentario');
+                });
+            });
+        </script>
+    </th:block>
+</body>
+</html>
