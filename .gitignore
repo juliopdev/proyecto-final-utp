@@ -2,6 +2,10 @@ HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
+!**/src/main/**/audio/
+!**/src/main/**/icon/
+!**/src/main/**/img/
+!**/src/main/**/video/
 !**/src/test/**/target/
 
 ### STS ###
