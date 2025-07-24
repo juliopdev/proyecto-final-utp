@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+  <body>
+    <header th:fragment="header">
+      <div class="nav-container">
+        <div class="Logo">
+          <a th:href="@{/}">
+            <img th:src="@{/assets/logo.png}" alt="Logo" class="responsive-img">
+          </a>
+        </div>
+        <nav class="menu">
+          <a th:href="@{/}"><p>Inicio</p></a>
+          <a th:href="@{/menu}"><p>Menú</p></a>
+          <a th:href="@{/nosotros}"><p>Nosotros</p></a>
+          <a href="#contacto"><p>Contactos</p></a>
+        </nav>
+        <div>
+          <!-- Modo Administrador -->
+          <th:block sec:authorize="hasRole('ADMIN')">
+            <div class="registro">
+              <a th:href="@{/admin}" class="admin-btn">
+                <i class="bi bi-basket-fill"></i> Registrar Productos
+              </a>
+            </div>
+            <div class="registro">
+              <a th:href="@{/logout}" class="admin-btn">
+                <i class="bi bi-box-arrow-right"></i> Salir Modo Admin
+              </a>
+            </div>
+          </th:block>
+
+          <!-- Usuario Autenticado (no admin) -->
+          <th:block sec:authorize="isAuthenticated() and !hasRole('ADMIN')">
+            <div class="registro">
+              <a th:href="@{/logout}">Cerrar sesión</a>
+            </div>
+          </th:block>
+
+          <!-- Usuario No Autenticado -->
+          <th:block sec:authorize="!isAuthenticated()">
+            <div class="registro">
+              <a th:href="@{/login}">Inicia sesión <img
+                  th:src="@{/assets/icon/iniciar_sesion.png}" alt></a>
+            </div>
+            <div class="carrito">
+              <a th:href="@{/carrito}"><img
+                  th:src="@{/assets/icon/carrito-de-compras.png}" alt></a>
+            </div>
+          </th:block>
+        </div>
+      </div>
+    </header>
+  </body>
+</html>

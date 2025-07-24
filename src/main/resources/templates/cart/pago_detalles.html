@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments/head :: head('Detalles de Pago - La Ruta del Sabor', ${'/css/style_pago_detalles.css'}, null)">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+    <div class="container my-5">
+        <!-- Header con navegación -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a th:href="@{/carrito}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Volver al Carrito
+            </a>
+            <h1 class="text-center flex-grow-1">Detalles de Pago</h1>
+            <div style="width: 150px;"></div> 
+        </div>
+
+        <!-- Indicadores de pasos -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-center align-items-center mb-3">
+                    <div class="step-indicator active" id="indicator-1">1</div>
+                    <div class="flex-fill border-top mx-2"></div>
+                    <div class="step-indicator" id="indicator-2">2</div>
+                    <div class="flex-fill border-top mx-2"></div>
+                    <div class="step-indicator" id="indicator-3">3</div>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 33.33%;" id="progress-bar">
+                        Paso 1 de 3
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen del carrito (sticky) -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-cart-check me-2"></i>Resumen del Pedido
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="resumen-carrito" class="mb-3">
+                            <!-- Se llenará dinámicamente con JavaScript -->
+                        </div>
+                        <div class="row text-end">
+                            <div class="col-md-4">
+                                <strong>Subtotal: S/ <span id="subtotal">0.00</span></strong>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Delivery: S/ <span id="delivery-cost">0.00</span></strong>
+                            </div>
+                            <div class="col-md-4">
+                                <h5><strong>Total: S/ <span id="total">0.00</span></strong></h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario multi-paso -->
+        <div class="card">
+            <div class="card-body">
+                <!-- Step 1: Datos del Cliente -->
+                <div class="step active step-container" id="step-1">
+                    <h3 class="mb-4">
+                        <i class="bi bi-person me-2"></i>Datos del Cliente
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nombre" class="form-label">Nombres *</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required 
+                                   th:value="${usuario?.nombres}" sec:authorize="isAuthenticated()">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="apellido" class="form-label">Apellidos *</label>
+                            <input type="text" class="form-control" id="apellido" name="apellido" required 
+                                   th:value="${usuario?.apellidos}" sec:authorize="isAuthenticated()">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="correo" class="form-label">Correo Electrónico *</label>
+                            <input type="email" class="form-control" id="correo" name="correo" required 
+                                   th:value="${usuario?.email}" sec:authorize="isAuthenticated()">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="telefono" class="form-label">Teléfono *</label>
+                            <input type="tel" class="form-control" id="telefono" name="telefono" required 
+                                   pattern="[0-9]{9}" title="Teléfono debe tener 9 dígitos numéricos"
+                                   placeholder="987654321" maxlength="9"
+                                   th:value="${usuario?.telefono}" sec:authorize="isAuthenticated()">
+                        </div>
+                        
+                        <!-- Tipo de Comprobante -->
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Tipo de Comprobante *</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="payment-option">
+                                        <div class="form-check">
+                                            <input type="radio" name="comprobante" id="boleta" value="boleta" 
+                                                   class="form-check-input" checked>
+                                            <label for="boleta" class="form-check-label">
+                                                <i class="bi bi-receipt me-2"></i>Boleta
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="payment-option">
+                                        <div class="form-check">
+                                            <input type="radio" name="comprobante" id="factura" value="factura" 
+                                                   class="form-check-input">
+                                            <label for="factura" class="form-check-label">
+                                                <i class="bi bi-file-earmark-text me-2"></i>Factura
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Campos condicionales para DNI/RUC -->
+                        <div class="col-md-6 mb-3" id="dni-container">
+                            <label for="dni" class="form-label">DNI *</label>
+                            <input type="text" class="form-control" id="dni" name="dni" required 
+                                   pattern="[0-9]{8}" title="DNI debe tener 8 dígitos numéricos"
+                                   placeholder="12345678" maxlength="8">
+                        </div>
+                        <div class="col-md-6 mb-3 d-none" id="ruc-container">
+                            <label for="ruc" class="form-label">RUC *</label>
+                            <input type="text" class="form-control" id="ruc" name="ruc" 
+                                   pattern="[0-9]{11}" title="RUC debe tener 11 dígitos numéricos"
+                                   placeholder="20123456789" maxlength="11">
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(1)">
+                            Siguiente <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Método de Entrega -->
+                <div class="step d-none step-container" id="step-2">
+                    <h3 class="mb-4">
+                        <i class="bi bi-truck me-2"></i>Método de Entrega
+                    </h3>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="payment-option">
+                                <div class="form-check">
+                                    <input type="radio" name="entrega" id="delivery" value="delivery" 
+                                           class="form-check-input" checked>
+                                    <label for="delivery" class="form-check-label">
+                                        <i class="bi bi-truck me-2"></i>Delivery
+                                        <small class="d-block text-muted">+ S/ 5.00 - Tiempo estimado: 25-40 min</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="payment-option">
+                                <div class="form-check">
+                                    <input type="radio" name="entrega" id="recoger" value="recoger" 
+                                           class="form-check-input">
+                                    <label for="recoger" class="form-check-label">
+                                        <i class="bi bi-shop me-2"></i>Recojo en Local
+                                        <small class="d-block text-muted">Gratis - Tiempo estimado: 15-25 min</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Campos condicionales para delivery -->
+                    <div class="row" id="delivery-fields">
+                        <div class="col-md-8 mb-3" id="direccion-container">
+                            <label for="direccion" class="form-label">Dirección de Entrega *</label>
+                            <textarea class="form-control" id="direccion" name="direccion" required rows="2"
+                                      placeholder="Ingresa tu dirección completa"
+                                      th:text="${usuario?.direccion}" sec:authorize="isAuthenticated()"></textarea>
+                        </div>
+                        <div class="col-md-4 mb-3" id="referencia-container">
+                            <label for="referencia" class="form-label">Referencia *</label>
+                            <input type="text" class="form-control" id="referencia" name="referencia" required
+                                   placeholder="Ej: Casa azul, frente al parque">
+                        </div>
+                    </div>
+
+                    <!-- Información del local para recojo -->
+                    <div class="alert alert-info d-none" id="local-info">
+                        <h6><i class="bi bi-geo-alt me-2"></i>Información del Local</h6>
+                        <p class="mb-1"><strong>Dirección:</strong> MegaPlaza Ica, Av de los Maestros, Ica</p>
+                        <p class="mb-1"><strong>Horario:</strong> Lunes a Sábado 11:00 am - 10:00 pm</p>
+                        <p class="mb-0"><strong>Teléfono:</strong> +51 974 478 045</p>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary btn-lg" onclick="prevStep(2)">
+                            <i class="bi bi-arrow-left me-2"></i>Atrás
+                        </button>
+                        <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(2)">
+                            Siguiente <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Método de Pago -->
+                <div class="step d-none step-container" id="step-3">
+                    <h3 class="mb-4">
+                        <i class="bi bi-credit-card me-2"></i>Método de Pago
+                    </h3>
+                    
+                    <!-- Selección de método de pago -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="payment-option">
+                                <div class="form-check">
+                                    <input type="radio" name="pago" id="tarjeta" value="tarjeta" 
+                                           class="form-check-input" checked>
+                                    <label for="tarjeta" class="form-check-label">
+                                        <i class="bi bi-credit-card me-2"></i>Tarjeta de Crédito/Débito
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="payment-option">
+                                <div class="form-check">
+                                    <input type="radio" name="pago" id="yape" value="yape" 
+                                           class="form-check-input">
+                                    <label for="yape" class="form-check-label">
+                                        <i class="bi bi-phone me-2"></i>Yape
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campos de Tarjeta -->
+                    <div id="campos-tarjeta">
+                        <div class="row">
+                            <div class="col-md-8 mb-3" id="tarjeta-container">
+                                <label for="numero-tarjeta" class="form-label">Número de Tarjeta *</label>
+                                <input type="text" class="form-control" id="numero-tarjeta" name="numeroTarjeta" required 
+                                       placeholder="1234 5678 9012 3456" maxlength="19">
+                            </div>
+                            <div class="col-md-4 mb-3" id="cvv-container">
+                                <label for="cvv" class="form-label">CVV *</label>
+                                <input type="text" class="form-control" id="cvv" name="cvv" required 
+                                       placeholder="123" maxlength="4">
+                            </div>
+                            <div class="col-md-6 mb-3" id="fecha-vencimiento-container">
+                                <label for="fecha-vencimiento" class="form-label">Fecha de Vencimiento *</label>
+                                <input type="text" class="form-control" id="fecha-vencimiento" name="fechaVencimiento" required 
+                                       placeholder="MM/YY" maxlength="5">
+                            </div>
+                            <div class="col-md-6 mb-3" id="titular-container">
+                                <label for="titular" class="form-label">Titular de la Tarjeta *</label>
+                                <input type="text" class="form-control" id="titular" name="titular" required 
+                                       placeholder="Nombre como aparece en la tarjeta">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campos de Yape -->
+                    <div id="campos-yape" class="d-none">
+                        <div class="row">
+                            <div class="col-md-6 mb-3" id="yape-numero-container">
+                                <label for="yape-numero" class="form-label">Número de Yape *</label>
+                                <input type="tel" class="form-control" id="yape-numero" name="yapeNumero" 
+                                       placeholder="987654321" maxlength="9">
+                            </div>
+                            <div class="col-md-6 mb-3" id="yape-codigo-container">
+                                <label for="yape-codigo" class="form-label">Código de Confirmación *</label>
+                                <input type="text" class="form-control" id="yape-codigo" name="yapeCodigo" 
+                                       placeholder="123456" maxlength="6">
+                                <small class="form-text text-muted">
+                                    Ingresa el código que aparece en tu app de Yape
+                                </small>
+                            </div>
+                        </div>
+                        <div class="alert alert-info">
+                            <h6><i class="bi bi-info-circle me-2"></i>Instrucciones para Yape:</h6>
+                            <ol class="mb-0">
+                                <li>Abre tu app de Yape</li>
+                                <li>Selecciona "Yapear"</li>
+                                <li>Ingresa el número: <strong>974 478 045</strong></li>
+                                <li>Monto: <strong>S/ <span id="total-yape">0.00</span></strong></li>
+                                <li>Copia el código de confirmación aquí</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Información de seguridad -->
+                    <div class="alert alert-success">
+                        <i class="bi bi-shield-check me-2"></i>
+                        Tu información de pago está protegida con encriptación SSL de 256 bits.
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary btn-lg" onclick="prevStep(3)">
+                            <i class="bi bi-arrow-left me-2"></i>Atrás
+                        </button>
+                        <button type="button" id="btn-procesar" class="btn btn-success btn-lg">
+                            <i class="bi bi-credit-card me-2"></i>Procesar Pago
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <div th:replace="fragments/theme-toggle :: theme-toggle"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/pago_detalles.js}"></script>
+    
+    <!-- Pasar datos del servidor al JavaScript -->
+    <script th:inline="javascript">
+        window.pagoDetallesData = {
+            subtotal: /*[[${subtotal}]]*/ 0,
+            deliveryCost: 5.00,
+            total: /*[[${total}]]*/ 0,
+            isAuthenticated: /*[[${#authentication.name != null}]]*/ false,
+            csrfToken: /*[[${_csrf.token}]]*/ '',
+            csrfParameterName: /*[[${_csrf.parameterName}]]*/ '_csrf'
+        };
+        
+        // JavaScript para manejar el cambio de método de pago
+        document.addEventListener('DOMContentLoaded', function() {
+            const tarjetaRadio = document.getElementById('tarjeta');
+            const yapeRadio = document.getElementById('yape');
+            const camposTarjeta = document.getElementById('campos-tarjeta');
+            const camposYape = document.getElementById('campos-yape');
+            const totalYape = document.getElementById('total-yape');
+            const deliveryRadio = document.getElementById('delivery');
+            const recogerRadio = document.getElementById('recoger');
+            const localInfo = document.getElementById('local-info');
+            const deliveryFields = document.getElementById('delivery-fields');
+
+            // Manejar cambio de método de pago
+            function togglePaymentFields() {
+                if (tarjetaRadio.checked) {
+                    camposTarjeta.classList.remove('d-none');
+                    camposYape.classList.add('d-none');
+                } else {
+                    camposTarjeta.classList.add('d-none');
+                    camposYape.classList.remove('d-none');
+                    // Actualizar total en Yape
+                    const total = document.getElementById('total').textContent;
+                    totalYape.textContent = total;
+                }
+            }
+
+            // Manejar cambio de método de entrega
+            function toggleDeliveryFields() {
+                if (deliveryRadio.checked) {
+                    deliveryFields.classList.remove('d-none');
+                    localInfo.classList.add('d-none');
+                } else {
+                    deliveryFields.classList.add('d-none');
+                    localInfo.classList.remove('d-none');
+                }
+            }
+
+            tarjetaRadio.addEventListener('change', togglePaymentFields);
+            yapeRadio.addEventListener('change', togglePaymentFields);
+            deliveryRadio.addEventListener('change', toggleDeliveryFields);
+            recogerRadio.addEventListener('change', toggleDeliveryFields);
+
+            // Inicializar
+            togglePaymentFields();
+            toggleDeliveryFields();
+        });
+    </script>
+
+</body>
+</html>

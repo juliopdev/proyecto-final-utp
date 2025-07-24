@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments/head :: head('Nosotros - La Ruta del Sabor', ${'/css/Nosotros.css'}, null)"></head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <div class="nosotros" id="nosotros">
+        <h2>Nosotros</h2>
+        <div class="nosotros-contenido">
+            <div class="nosotros-imagen">
+                <img th:src="@{/Icon/cocinando.jpg}" alt="Nuestro equipo cocinando hamburguesas" class="responsive-img">
+            </div>
+            <div class="nosotros-texto">
+                <h3>Nuestra Historia</h3>
+                <p>
+                    La Ruta del Sabor nació de la pasión por la buena comida y el deseo de ofrecer las mejores
+                    hamburguesas y salchipapas de la ciudad.
+                    Fundado en 2021 por Panchito, lo que comenzó como un pequeño carrito de comida se ha convertido
+                    en un punto de encuentro para los amantes de los sabores auténticos y las porciones generosas.
+                </p>
+                <h3>Nuestra Filosofía</h3>
+                <p>
+                    En La Ruta del Sabor, creemos que la clave de una gran hamburguesa o salchipapa está en la
+                    calidad de los ingredientes y la dedicación en cada paso de la preparación.
+                    Utilizamos carne fresca, pan artesanal, vegetales de la región y salsas caseras para garantizar
+                    una explosión de sabor en cada bocado.
+                    Nuestra misión es brindarte una experiencia gastronómica que te haga sentir como en casa, con un
+                    servicio amable y un ambiente acogedor.
+                </p>
+                <h3>Lo Que Nos Distingue</h3>
+                <ul>
+                    <li><b>🍅 Ingredientes Frescos:</b> Seleccionamos cuidadosamente cada ingrediente.</li>
+                    <li><b>🍔 Recetas Únicas:</b> Desde clásicas hasta combinaciones atrevidas.</li>
+                    <li><b>🏠 Ambiente Agradable:</b> Queremos que te sientas como en casa.</li>
+                    <li><b>🌱 Compromiso con la Comunidad:</b> Apoyamos a los productores locales.</li>
+                </ul>
+                <p>
+                    Te invitamos a visitarnos y descubrir por qué La Ruta del Sabor es el destino preferido de los
+                    que buscan una comida rápida deliciosa y de calidad. ¡Te esperamos!
+                </p>
+            </div>
+        </div>
+    </div>  
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer-simple"></div>
+
+    <!-- Bottom Navigation -->
+    <div th:replace="fragments/bottom-nav :: bottom-nav"></div>
+
+    <!-- Theme Toggle -->
+    <div th:replace="fragments/theme-toggle :: theme-toggle"></div>
+
+    <!-- Scripts comunes para tema -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Aplicar tema guardado al cargar la página
+            const icono = document.getElementById('iconoTema');
+            if (localStorage.getItem('tema') === 'oscuro') {
+                document.body.classList.add('bg-dark', 'text-light');
+                if (icono) icono.textContent = '🌙';
+            }
+        });
+
+        function cambiarTema() {
+            const body = document.body;
+            const icono = document.getElementById('iconoTema');
+            body.classList.toggle('bg-dark');
+            body.classList.toggle('text-light');
+            const esOscuro = body.classList.contains('bg-dark');
+            if (icono) icono.textContent = esOscuro ? '🌙' : '☀️';
+            localStorage.setItem('tema', esOscuro ? 'oscuro' : 'claro');
+        }
+    </script>
+
+</body>
+</html>

@@ -17,7 +17,6 @@ import org.thymeleaf.templatemode.TemplateMode;
  * - View resolver
  * - Configuraciones de desarrollo
  * 
- * @author Julio Pariona
  */
 @Configuration
 public class ThymeleafConfig {

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments/head :: head('Sobre Nosotros - La Ruta del Sabor', ${'/css/sobre-nosotros.css'}, null)"></head>
+<body>
+
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Contenido de la página -->
+    <main class="sobre-nosotros">
+        <section class="intro">
+            <h1>¿Quiénes somos?</h1>
+            <p>
+                En <strong>La Ruta del Sabor</strong>, más que un restaurante, somos un rincón donde la comida y la pasión se encuentran.
+                Desde nuestros inicios, nos hemos dedicado a ofrecer experiencias sabrosas, caseras y con alma peruana.
+            </p>
+        </section>
+
+        <section class="mision-vision">
+            <div class="cuadro-info">
+                <h3>Misión</h3>
+                <p>
+                    Brindar a cada cliente una comida rápida que conserve el sabor auténtico y casero, usando ingredientes frescos,
+                    atención cálida y precios accesibles para toda la familia.
+                </p>
+            </div>
+            <div class="cuadro-info">
+                <h3>Visión</h3>
+                <p>
+                    Convertirnos en el restaurante de referencia en el Perú, llevando nuestra propuesta culinaria a nuevas ciudades
+                    sin perder nuestra esencia artesanal.
+                </p>
+            </div>
+        </section>
+
+        <section class="valores">
+            <h2>Valores que nos definen</h2>
+            <ul>
+                <li><strong>Pasión por lo que hacemos:</strong> Cada plato está preparado con amor y orgullo.</li>
+                <li><strong>Compromiso con la calidad:</strong> Desde nuestros insumos hasta el servicio.</li>
+                <li><strong>Respeto a nuestros clientes:</strong> Ellos son el corazón de nuestra familia.</li>
+                <li><strong>Trabajo en equipo:</strong> Crecemos juntos, cada día.</li>
+            </ul>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer-simple"></div>
+
+    <!-- Bottom Navigation -->
+    <div th:replace="fragments/bottom-nav :: bottom-nav"></div>
+
+    <!-- Theme Toggle -->
+    <div th:replace="fragments/theme-toggle :: theme-toggle"></div>
+
+    <!-- Scripts comunes para tema -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Aplicar tema guardado al cargar la página
+            const icono = document.getElementById('iconoTema');
+            if (localStorage.getItem('tema') === 'oscuro') {
+                document.body.classList.add('bg-dark', 'text-light');
+                if (icono) icono.textContent = '🌙';
+            }
+        });
+
+        function cambiarTema() {
+            const body = document.body;
+            const icono = document.getElementById('iconoTema');
+            body.classList.toggle('bg-dark');
+            body.classList.toggle('text-light');
+            const esOscuro = body.classList.contains('bg-dark');
+            if (icono) icono.textContent = esOscuro ? '🌙' : '☀️';
+            localStorage.setItem('tema', esOscuro ? 'oscuro' : 'claro');
+        }
+    </script>
+
+</body>
+</html>

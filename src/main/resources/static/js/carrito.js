@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Inicializa el carrito al cargar la página
     actualizarCarrito();
-    renderAuthButtons(); // <-- Agrega esta línea
+    // renderAuthButtons(); // <-- Agrega esta línea
 });
 
 // Aplica el tema oscuro al cargar la página (duplicado, asegura el tema)
@@ -114,54 +114,54 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // Renderiza los botones de autenticación según el estado del usuario (admin o normal)
-function renderAuthButtons() {
-    const authButtons = document.getElementById('auth-buttons');
-    const user = JSON.parse(localStorage.getItem('user'));
-    const token = localStorage.getItem('token');
+// function renderAuthButtons() {
+//     const authButtons = document.getElementById('auth-buttons');
+//     const user = JSON.parse(localStorage.getItem('user'));
+//     const token = localStorage.getItem('token');
     
-    authButtons.innerHTML = '';
+//     authButtons.innerHTML = '';
 
-    if (token && user && user.email === 'test@test.com') {
-        // Modo administrador
-        authButtons.innerHTML = `
-            <div class="registro">
-                <a href="admin.html" class="admin-btn">
-                    <i class="bi bi-basket-fill"></i> Registrar Productos
-                </a>
-            </div>
-            <div class="registro">
-                <a href="#" onclick="logout()" class="admin-btn">
-                    <i class="bi bi-box-arrow-right"></i> Salir Modo Admin
-                </a>
-            </div>
-        `;
-    } else if (token && user) {
-        // Usuario común logeado
-        authButtons.innerHTML = `
-            <div class="registro">
-                <a href="#" onclick="logout()">Cerrar sesión</a>
-            </div>
-            <div class="carrito">
-                <a href="carrito.html"><img src="Icon/carrito-de-compras.png" alt=""></a>
-            </div>
-        `;
-    } else {
-        // No autenticado
-        authButtons.innerHTML = `
-            <div class="registro">
-                <a href="login.html">Inicia sesión <img src="Icon/iniciar_sesion.png" alt=""></a>
-            </div>
-            <div class="carrito">
-                <a href="carrito.html"><img src="Icon/carrito-de-compras.png" alt=""></a>
-            </div>
-        `;
-    }
-}
+//     if (token && user && user.email === 'test@test.com') {
+//         // Modo administrador
+//         authButtons.innerHTML = `
+//             <div class="registro">
+//                 <a href="admin.html" class="admin-btn">
+//                     <i class="bi bi-basket-fill"></i> Registrar Productos
+//                 </a>
+//             </div>
+//             <div class="registro">
+//                 <a href="#" onclick="logout()" class="admin-btn">
+//                     <i class="bi bi-box-arrow-right"></i> Salir Modo Admin
+//                 </a>
+//             </div>
+//         `;
+//     } else if (token && user) {
+//         // Usuario común logeado
+//         authButtons.innerHTML = `
+//             <div class="registro">
+//                 <a href="#" onclick="logout()">Cerrar sesión</a>
+//             </div>
+//             <div class="carrito">
+//                 <a href="carrito.html"><img src="Icon/carrito-de-compras.png" alt=""></a>
+//             </div>
+//         `;
+//     } else {
+//         // No autenticado
+//         authButtons.innerHTML = `
+//             <div class="registro">
+//                 <a href="login.html">Inicia sesión <img src="assets/icon/iniciar_sesion.png" alt=""></a>
+//             </div>
+//             <div class="carrito">
+//                 <a href="carrito.html"><img src="Icon/carrito-de-compras.png" alt=""></a>
+//             </div>
+//         `;
+//     }
+// }
 
 // Cierra la sesión del usuario y redirige al inicio
 function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    renderAuthButtons();
+    // renderAuthButtons();
     window.location.href = 'index.html';
 }

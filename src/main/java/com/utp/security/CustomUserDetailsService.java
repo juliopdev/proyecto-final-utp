@@ -1,103 +1,49 @@
 package com.utp.security;
 
-import com.utp.proyectofinal.models.entities.User;
-import com.utp.proyectofinal.repositories.postgresql.UserRepository;
+import com.utp.proyectofinal.models.entities.Cliente;
+import com.utp.proyectofinal.repositories.postgresql.ClienteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-/**
- * Servicio personalizado para cargar detalles de usuario
- * 
- * PATRONES IMPLEMENTADOS:
- * - ADAPTER: Adapta la entidad User a UserDetails de Spring Security
- * - PROXY: Actúa como proxy entre Spring Security y el repositorio de usuarios
- * - TEMPLATE METHOD: Implementa el template definido por UserDetailsService
- * 
- * @author Julio Pariona
- */
-@Service
+@Service("securityUserDetailsService")
 @RequiredArgsConstructor
 @Slf4j
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final ClienteRepository clienteRepository;
 
-    /**
-     * PATRÓN TEMPLATE METHOD: Implementación del método template
-     * PATRÓN ADAPTER: Convierte User entity a UserDetails
-     */
     @Override
-    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        log.debug("Intentando cargar usuario por email: {}", email);
+        log.debug("Cargando usuario por email: {}", email);
         
-        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
-                .orElseThrow(() -> {
-                    log.warn("Usuario no encontrado con email: {}", email);
-                    return new UsernameNotFoundException("Usuario no encontrado con email: " + email);
-                });
+        Cliente cliente = clienteRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email));
 
-        if (!user.isEnabled()) {
-            log.warn("Usuario deshabilitado con email: {}", email);
-            throw new UsernameNotFoundException("Usuario deshabilitado: " + email);
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        
+        // Agregar rol del cliente
+        if (cliente.getRol() != null) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + cliente.getRol().getNombreRol()));
         }
 
-        log.debug("Usuario cargado exitosamente: {}", email);
-        return buildUserDetails(user);
-    }
-
-    /**
-     * PATRÓN ADAPTER: Convierte entidad User a UserDetails
-     */
-    private UserDetails buildUserDetails(User user) {
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getEmail())
-                .password(user.getPassword())
-                .disabled(!user.isEnabled())
+        return User.builder()
+                .username(cliente.getEmail())
+                .password(cliente.getPasswordHash())
+                .authorities(authorities)
                 .accountExpired(false)
-                .accountLocked(user.isLocked())
+                .accountLocked(false)
                 .credentialsExpired(false)
-                .authorities(getAuthorities(user))
+                .disabled(false)
                 .build();
-    }
-
-    /**
-     * Extrae las autoridades/roles del usuario
-     */
-    private Collection<? extends GrantedAuthority> getAuthorities(User user) {
-        return user.getRoles().stream()
-                .map(role -> {
-                    System.out.println("CustomUserDetailsService.java - 81: " + role.getName());
-                    return new SimpleGrantedAuthority("ROLE_" + role.getName());
-                })
-                // .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Método adicional para obtener usuario por ID (usado por JWT)
-     */
-    @Transactional(readOnly = true)
-    public UserDetails loadUserById(Long userId) {
-        log.debug("Cargando usuario por ID: {}", userId);
-        
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
-                .orElseThrow(() -> {
-                    log.warn("Usuario no encontrado con ID: {}", userId);
-                    return new UsernameNotFoundException("Usuario no encontrado con ID: " + userId);
-                });
-
-        return buildUserDetails(user);
     }
 }

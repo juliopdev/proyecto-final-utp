@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments/head :: head('Confirmación de Pedido - La Ruta del Sabor', ${'/css/style_confirmacion.css'}, null)"></head>
+<body>
+    <div class="container my-5 p-4 rounded shadow-lg fondo-claro">
+        <h1 class="text-center mb-4" id="confirmacion-header" th:text="${pedido.estado == 'COMPLETADO' ? '¡Pedido Confirmado!' : '¡Gracias por tu pedido!'}">¡Pedido Confirmado!</h1>
+        <p class="text-center" id="mensaje-entrega" th:text="${pedido.tipoEntrega == 'delivery' ? 'Tu pedido será entregado en la dirección proporcionada en aproximadamente 45 minutos.' : 'Tu pedido estará listo para recoger en nuestro local en aproximadamente 30 minutos.'}">
+            Tu pedido será entregado en la dirección proporcionada en aproximadamente 45 minutos.
+        </p>
+
+        <h3>Resumen del Pedido</h3>
+        <div class="row" id="pedido-grid">
+            <!-- Mostrar items del pedido -->
+            <div th:each="item : ${pedido.items}" class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100">
+                    <img th:src="${item.producto.imagen}" class="card-img-top" th:alt="${item.producto.nombre}" th:if="${item.producto.imagen}">
+                    <img th:src="@{/Icon/default-food.png}" class="card-img-top" th:alt="${item.producto.nombre}" th:unless="${item.producto.imagen}">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${item.producto.nombre}">Producto</h5>
+                        <p class="card-text" th:text="${item.producto.descripcion}">Descripción</p>
+                        <p class="card-text">
+                            <strong>Precio unitario: S/ <span th:text="${#numbers.formatDecimal(item.precioUnitario, 1, 2)}">0.00</span></strong><br>
+                            <strong>Cantidad: <span th:text="${item.cantidad}">1</span></strong><br>
+                            <strong>Subtotal: S/ <span th:text="${#numbers.formatDecimal(item.subtotal, 1, 2)}">0.00</span></strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="totales text-end mt-4 text-subtotal">
+            <p><strong>Cliente:</strong> <span id="cliente-nombre" th:text="${pedido.nombreCliente}">Cliente</span></p>
+            <p><strong>Comprobante:</strong> <span id="comprobante" th:text="${pedido.tipoComprobante}">boleta</span></p>
+            <p><strong>Número de Pedido:</strong> <span th:text="${pedido.numeroPedido}">#0001</span></p>
+            <p><strong>Fecha:</strong> <span th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy HH:mm')}">23/07/2025 14:30</span></p>
+            <p><strong>Método de Entrega:</strong> <span th:text="${pedido.tipoEntrega == 'delivery' ? 'Delivery' : 'Recojo en local'}">Delivery</span></p>
+            <p th:if="${pedido.tipoEntrega == 'delivery'}"><strong>Dirección:</strong> <span th:text="${pedido.direccion}">Dirección</span></p>
+            <p><strong>Método de Pago:</strong> <span th:text="${pedido.metodoPago}">Tarjeta</span></p>
+            <p><strong>Subtotal:</strong> S/ <span id="subtotal" th:text="${#numbers.formatDecimal(pedido.subtotal, 1, 2)}">0.00</span></p>
+            <p><strong>Costo de Delivery:</strong> S/ <span id="delivery-cost" th:text="${#numbers.formatDecimal(pedido.costoDelivery, 1, 2)}">0.00</span></p>
+            <p><strong>Total:</strong> S/ <span id="total" th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}">0.00</span></p>
+        </div>
+
+        <div class="text-center mt-4">
+            <button onclick="window.location.href='/'" class="btn btn-lg btn-confirmar">Volver al Inicio</button>
+            <button onclick="window.print()" class="btn btn-lg btn-secondary ms-2">Imprimir Comprobante</button>
+        </div>
+        
+        <!-- Información adicional -->
+        <div class="alert alert-info mt-4">
+            <h5>Información Importante:</h5>
+            <ul>
+                <li>Guarda este número de pedido para futuras consultas: <strong th:text="${pedido.numeroPedido}">#0001</strong></li>
+                <li>Recibirás notificaciones sobre el estado de tu pedido</li>
+                <li th:if="${pedido.tipoEntrega == 'delivery'}">El delivery se contactará contigo antes de llegar</li>
+                <li th:if="${pedido.tipoEntrega == 'recoger'}">Te esperamos en: MegaPlaza Ica, Av de los Maestros, Ica</li>
+                <li>Para consultas: +51 974 478 045</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <div th:replace="fragments/theme-toggle :: theme-toggle"></div>
+
+    <!-- Scripts -->
+    <script th:src="@{/js/confirmacion.js}"></script>
+    
+    <!-- Pasar datos del pedido al JavaScript si es necesario -->
+    <script th:inline="javascript">
+        window.pedidoData = {
+            numeroPedido: /*[[${pedido.numeroPedido}]]*/ '',
+            estado: /*[[${pedido.estado}]]*/ '',
+            total: /*[[${pedido.total}]]*/ 0
+        };
+    </script>
+
+    <!-- Script para tema -->
+    <script>
+        function cambiarTema() {
+            const body = document.body;
+            const icono = document.getElementById('iconoTema');
+            body.classList.toggle('bg-dark');
+            body.classList.toggle('text-light');
+            const esOscuro = body.classList.contains('bg-dark');
+            if (icono) icono.textContent = esOscuro ? '🌙' : '☀️';
+            localStorage.setItem('tema', esOscuro ? 'oscuro' : 'claro');
+        }
+
+        // Aplicar tema al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            const icono = document.getElementById('iconoTema');
+            if (localStorage.getItem('tema') === 'oscuro') {
+                document.body.classList.add('bg-dark', 'text-light');
+                if (icono) icono.textContent = '🌙';
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+</body>
+</html>

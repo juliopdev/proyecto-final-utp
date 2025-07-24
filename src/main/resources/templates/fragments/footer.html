@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Footer completo para páginas principales -->
+    <footer th:fragment="footer-complete" id="contacto">
+        <div class="footer-contenedor">
+            <!-- Sección 1: Contacto -->
+            <div class="footer-seccion contacto">
+                <h3>Contacto</h3>
+                <div class="footer-info">
+                    <p><strong>Correo:</strong></p>
+                    <div class="linea-info">
+                        <img th:src="@{/Icon/correo.png}" alt="" class="icono">
+                        <a href="mailto:larutadelsaborrestaurante@gmail.com">larutadelsaborrestaurante@gmail.com</a>
+                    </div>
+                    <div class="linea-info">
+                        <img th:src="@{/Icon/correo.png}" alt="" class="icono">
+                        <span>pedidoslarutadelsabor@gmail.com</span>
+                    </div>
+                    <p><strong>Teléfonos:</strong></p>
+                    <div class="linea-info">
+                        <img th:src="@{/Icon/telefono.png}" alt="" class="icono">
+                        <span>+51 974 478 045</span>
+                    </div>
+                    <div class="linea-info">
+                        <img th:src="@{/Icon/telefono.png}" alt="" class="icono">
+                        <span>+51 (01) 746-6817</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Sección 2: Atención al Cliente -->
+            <div class="footer-seccion cliente">
+                <h3>Atención al Cliente</h3>
+                <div class="footer-info">
+                    <p><strong>Dirección:</strong></p>
+                    <div class="linea-info">
+                        <img th:src="@{/Icon/direccion.png}" alt="" class="icono">
+                        <span>MegaPlaza Ica, Av de los Maestros, Ica</span>
+                    </div>
+                    <p><strong>Formas de pago:</strong></p>
+                    <div class="linea-info">
+                        <img th:src="@{/Icon/tarjeta.png}" alt="" class="icono">
+                        <span>Tarjetas</span>
+                    </div>
+                    <div class="linea-info">
+                        <img th:src="@{/Icon/efectivo.png}" alt="" class="icono">
+                        <span>Efectivo</span>
+                    </div>
+                    <div class="linea-info">
+                        <img th:src="@{/Icon/yape_plin.png}" alt="" class="icono">
+                        <span>Yape o Plin</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Sección 3: Sobre Nosotros -->
+            <div class="footer-seccion">
+                <h3>Sobre Nosotros</h3>
+                <ul>
+                    <li><a th:href="@{/nosotros}">Nosotros</a></li>
+                    <li><a th:href="@{/sobre-nosotros}">Sobre Nosotros</a></li>
+                </ul>
+            </div>
+            <!-- Sección 4: Horario -->
+            <div class="footer-seccion">
+                <h3>Horario de Atención</h3>
+                <table class="contacto-tabla">
+                    <thead>
+                        <tr>
+                            <th>Días</th>
+                            <th>Horas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Lunes a Sábado</td>
+                            <td>11:00 am - 10:00 pm</td>
+                        </tr>
+                        <tr>
+                            <td>Domingos y Feriados</td>
+                            <td>11:00 am - 05:00 pm</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Línea blanca -->
+        <hr class="footer-linea" />
+        <p class="footer-copy">© 2025 Restaurant La Ruta del Sabor. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Footer simple para páginas secundarias -->
+    <footer th:fragment="footer-simple">
+        <p>&copy; 2025 Restaurant La Ruta del Sabor. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>

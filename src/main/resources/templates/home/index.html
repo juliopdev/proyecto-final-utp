@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+  <head
+    th:replace="fragments/head :: head('La Ruta del Sabor', ${additionalCss}, null)"></head>
+  <body>
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!--Carrusel de imágenes-->
+    <main>
+      <div class="inicio" id="inicio">
+        <div class="imagenes-promocional">
+          <div id="miCarrusel" class="carousel slide" data-bs-ride="carousel">
+            <!-- Indicadores (puntos) -->
+            <div class="carousel-indicators">
+              <button type="button" data-bs-target="#miCarrusel"
+                data-bs-slide-to="0" class="active"></button>
+              <button type="button" data-bs-target="#miCarrusel"
+                data-bs-slide-to="1"></button>
+              <button type="button" data-bs-target="#miCarrusel"
+                data-bs-slide-to="2"></button>
+            </div>
+            <!-- Imágenes del carrusel -->
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                <img th:src="@{/assets/img/banner1.jpg}" class="d-block w-100"
+                  alt="Imagen 1">
+              </div>
+              <div class="carousel-item">
+                <img th:src="@{/assets/img/banner2.jpg}" class="d-block w-100"
+                  alt="Imagen 2">
+              </div>
+              <div class="carousel-item">
+                <img th:src="@{/assets/img/banner3.jpg}" class="d-block w-100"
+                  alt="Imagen 3">
+              </div>
+            </div>
+            <!-- Controles del carrusel -->
+            <button class="carousel-control-prev" type="button"
+              data-bs-target="#miCarrusel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button"
+              data-bs-target="#miCarrusel" data-bs-slide="next">
+              <span class="carousel-control-next-icon"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenedor Menú -->
+      <br>
+      <div class="container">
+        <h1>Elige lo que más te guste!!</h1>
+        <section class="card-custom"></section>
+        <!-- Galería de estilo visual tipo secciones de menú -->
+        <div class="menu-preview">
+          <!-- Renderizar categorías dinámicamente desde el servidor -->
+          <div th:each="categoria : ${categorias}" class="menu-item">
+            <div class="image-container">
+              <img th:src="@{/assets/img/} + ${categoria.imagenUrl}" alt
+                th:if="${categoria.imagenUrl}">
+            </div>
+            <div class="info">
+              <h5 th:text="${categoria.nombre}">CATEGORÍA</h5>
+              <a th:href="@{/menu(categoria=${categoria.nombre})}"
+                class="btn_2">Ver más</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="video-btn-container">
+          <video class="video-fondo" muted loop playsinline>
+            <source
+              th:src="@{/assets/video/AI Burger Commercial (online-video-cutter.com).mp4}"
+              type="video/mp4">
+          </video>
+          <button th:onclick="reproducirSonidoYRedirigir()" class="ver-mas-btn">Ver menú
+            completo</button><br>
+        </div>
+      </div>
+    </main>
+
+    <br>
+    <div id="contenedorResenas" class="bg-gray-100 py-10 px-4">
+      <div class="max-w-7xl mx-auto relative">
+        <h2 class="text-2xl font-bold text-center mb-6">Reseñas destacadas</h2>
+
+        <!-- Carrusel -->
+        <div id="carruselResenas"
+          class="carrusel flex gap-4 no-scrollbar px-10">
+          <!-- Reseñas desde el servidor -->
+          <div th:each="resena : ${resenas}"
+            class="bg-white p-4 rounded-lg shadow min-w-80">
+            <div class="flex items-center mb-2">
+              <strong th:text="${resena.nombre}">Nombre</strong>
+              <span class="ml-2 text-yellow-500"
+                th:text="${resena.puntuacion}">5/5</span>
+            </div>
+            <p class="text-sm text-gray-600 mb-2"
+              th:text="${resena.medio}">Aspecto</p>
+            <p th:text="${resena.comentario}">Comentario de la reseña</p>
+          </div>
+        </div>
+
+        <div class="text-center mt-8">
+          <button onclick="abrirFormularioComentario()"
+            class="bg-red-600 text-white px-6 py-2 rounded-full shadow hover:bg-gray-700">Agregar
+            Comentario</button>
+
+          <!-- Modal de comentario -->
+          <div id="modalComentario"
+            class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex justify-center items-center hidden z-50">
+            <div
+              class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full text-black">
+              <h3 class="text-lg font-bold mb-4">Agregar nuevo comentario</h3>
+
+              <!-- Nombre -->
+              <input id="nombreCritico" type="text"
+                placeholder="Nombre del crítico"
+                class="w-full mb-2 p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 text-black" />
+
+              <!-- Medio (select) -->
+              <select id="medioCritico"
+                class="w-full mb-2 p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 text-black">
+                <option value>Selecciona un aspecto</option>
+                <option value="comida">Comida</option>
+                <option value="atencion">Atención</option>
+                <option value="tiempo de espera">Tiempo de espera</option>
+                <option value="ambiente">Ambiente</option>
+              </select>
+
+              <!-- Comentario -->
+              <textarea id="textoComentario" placeholder="Tu comentario"
+                class="w-full mb-2 p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 text-black"></textarea>
+
+              <!-- Puntuación (select) -->
+              <select id="puntuacion"
+                class="w-full mb-4 p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 text-black">
+                <option value>Selecciona puntuación</option>
+                <option value="1/5">1/5</option>
+                <option value="2/5">2/5</option>
+                <option value="3/5">3/5</option>
+                <option value="4/5">4/5</option>
+                <option value="5/5">5/5</option>
+              </select>
+
+              <!-- Botones -->
+              <div class="flex justify-end gap-2">
+                <button onclick="cerrarFormularioComentario()"
+                  class="bg-blue-600 text-black px-4 py-2 rounded hover:bg-gray-700">
+                  Cancelar
+                </button>
+                <button onclick="agregarComentario()"
+                  class="bg-red-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+                  Agregar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón izquierdo (<) -->
+        <button onclick="anterior()"
+          class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white text-gray-800 border border-gray-300 p-3 rounded-full text-2xl shadow hover:bg-gray-200 z-10">
+          &lt;
+        </button>
+
+        <!-- Botón derecho (>) -->
+        <button onclick="siguiente()"
+          class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white text-gray-800 border border-gray-300 p-3 rounded-full text-2xl shadow hover:bg-gray-200 z-10">
+          &gt;
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer-complete"></div>
+
+    <!-- Audio escondido -->
+    <audio id="click-sound" th:src="@{/assets/audio/sonido.mp3}"
+      preload="auto"></audio>
+
+    <!-- Bottom Navigation -->
+    <div th:replace="fragments/bottom-nav :: bottom-nav"></div>
+
+    <!-- Theme Toggle -->
+    <div th:replace="fragments/theme-toggle :: theme-toggle"></div>
+
+    <!-- Scripts -->
+    <script th:src="@{/js/index.js}"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+      crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -22,7 +22,6 @@ import java.util.Properties;
  * - TransactionManager
  * - Propiedades de Hibernate
  * 
- * @author Julio Pariona
  */
 @Configuration
 @EnableTransactionManagement

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments/head :: head('Carrito de compras - La Ruta del Sabor', null, null)">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+    <!-- Verificar modo administrador -->
+    <script sec:authorize="hasRole('ADMIN')">
+        alert('Modo administrador: No puedes acceder al carrito.');
+        window.location.href = '/';
+    </script>
+
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main>
+        <section class="seccion-carrito">
+            <div class="carrito-contenedor">
+                <h2>Tu Carrito</h2>
+                <div class="carrito-grid" id="carrito-grid">
+                    <!-- Para usuarios autenticados: renderizar carrito desde servidor -->
+                    <th:block sec:authorize="isAuthenticated() and !hasRole('ADMIN')">
+                        <div th:if="${#lists.isEmpty(carritoItems)}" class="carrito-vacio">
+                            <h3>Tu carrito está vacío</h3>
+                            <p>¡Agrega algunos productos deliciosos!</p>
+                        </div>
+                        
+                        <div th:each="item : ${carritoItems}" class="carrito-item">
+                            <img th:src="${item.producto.imagen}" th:alt="${item.producto.nombre}" class="responsive-img" th:if="${item.producto.imagen}">
+                            <img th:src="@{/Icon/default-food.png}" th:alt="${item.producto.nombre}" class="responsive-img" th:unless="${item.producto.imagen}">
+                            <div class="item-info">
+                                <h4 th:text="${item.producto.nombre}">Nombre del Producto</h4>
+                                <p th:text="${item.producto.descripcion}">Descripción</p>
+                                <p class="precio">S/ <span th:text="${item.producto.precio}">0.00</span></p>
+                            </div>
+                            <div class="item-controls">
+                                <button class="btn-cantidad" th:onclick="'disminuirCantidad(' + ${item.id} + ')'">-</button>
+                                <span class="cantidad" th:text="${item.cantidad}">1</span>
+                                <button class="btn-cantidad" th:onclick="'aumentarCantidad(' + ${item.id} + ')'">+</button>
+                                <button class="btn-eliminar" th:onclick="'eliminarItem(' + ${item.id} + ')'" title="Eliminar">🗑️</button>
+                            </div>
+                        </div>
+                    </th:block>
+                    
+                    <!-- Para usuarios no autenticados: carrito se maneja con JavaScript -->
+                    <th:block sec:authorize="!isAuthenticated()">
+                        <!-- Los productos se cargarán dinámicamente desde localStorage -->
+                    </th:block>
+                </div>
+                
+                <div class="resumen" id="resumen">
+                    <div class="resumen-botones">
+                        <button class="btn-seguir" id="btn-seguir" onclick="window.location.href='/menu'">Seguir Comprando</button>
+                        <button class="btn-comprar" id="btn-comprar" th:onclick="'irAPagar()'">Ir a Pagar</button>
+                    </div>
+                    <h3>Subtotal: S/ <span id="subtotal" th:text="${subtotal ?: '0.00'}">0.00</span></h3>
+                </div>
+            </div>
+        </section><br><br>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <div th:replace="fragments/bottom-nav :: bottom-nav"></div>
+
+    <!-- Scripts -->
+    <script th:src="@{/js/carrito.js}"></script>
+    
+    <!-- Pasar datos del servidor al JavaScript -->
+    <script th:inline="javascript" sec:authorize="isAuthenticated() and !hasRole('ADMIN')">
+        // Para usuarios autenticados, pasar datos del servidor
+        window.carritoServerData = {
+            items: /*[[${carritoItems}]]*/ [],
+            subtotal: /*[[${subtotal}]]*/ 0,
+            isAuthenticated: true
+        };
+    </script>
+    
+    <script th:inline="javascript" sec:authorize="!isAuthenticated()">
+        // Para usuarios no autenticados, indicar que use localStorage
+        window.carritoServerData = {
+            items: [],
+            subtotal: 0,
+            isAuthenticated: false
+        };
+    </script>
+
+    <!-- Script para tema -->
+    <script>
+        function cambiarTema() {
+            const body = document.body;
+            const icono = document.getElementById('iconoTema');
+            body.classList.toggle('bg-dark');
+            body.classList.toggle('text-light');
+            const esOscuro = body.classList.contains('bg-dark');
+            if (icono) icono.textContent = esOscuro ? '🌙' : '☀️';
+            localStorage.setItem('tema', esOscuro ? 'oscuro' : 'claro');
+        }
+
+        // Aplicar tema al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            const icono = document.getElementById('iconoTema');
+            if (localStorage.getItem('tema') === 'oscuro') {
+                document.body.classList.add('bg-dark', 'text-light');
+                if (icono) icono.textContent = '🌙';
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+</body>
+</html>

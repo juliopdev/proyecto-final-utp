@@ -17,7 +17,6 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  * - MongoTemplate
  * - Configuración de base de datos
  * 
- * @author Julio Pariona
  */
 @Configuration
 @EnableMongoRepositories(basePackages = "com.utp.proyectofinal.repositories.mongodb")
