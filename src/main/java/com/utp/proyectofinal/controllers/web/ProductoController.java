@@ -4,19 +4,19 @@ package com.utp.proyectofinal.controllers.web;
 // import com.utp.proyectofinal.models.dto.CategoriaDTO;
 // import com.utp.proyectofinal.services.ProductoService;
 // import com.utp.proyectofinal.services.CategoriaService;
-import jakarta.validation.Valid;
+// import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+// import org.springframework.data.domain.Page;
+// import org.springframework.data.domain.PageRequest;
+// import org.springframework.data.domain.Pageable;
+// import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+// import org.springframework.ui.Model;
+// import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+// import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
+// import java.util.List;
 
 @Controller
 @RequestMapping("/productos")
